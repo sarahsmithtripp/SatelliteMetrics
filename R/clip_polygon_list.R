@@ -2,82 +2,119 @@
 #'
 #'
 #' @param sample_polygons should be a polygon list in SF language
-#' @param raster is a raster that will be clipped for each polygon
-#' @param return_rasters would yuo like to return the raster list?
+#' @param sds_choose is a spat raster dataset that will be clipped for each polygon
+#' @param file_save the location to store the clipped polygons
+#' @examples
+#' file_save <- c('.')
+#' sample_polygons <- read_sf('./shapefile.shp')
+#' sds_to_run <- terra::sds(list.files('./stacked_metrics', pattern =- '00.tif$', full.names = T))
 #'
-#' #' @examples
+#' clip_polygon_list(sample_polygons, sds_choose = sds_to_run, file_save = file_save)
 #'
 #' @export
 #' @importFrom dplyr %>%
 
 
-clip_polygon_list <- function(sample_polygons, raster, return_rasters) {
-  #Make a some lists to store information from the function
-  polygon_info <- list()
-  summary_polygons <- list()
-  rast_clips <- list()
-  if (class(sample_polygons) == 'SpatVector') {
-    polygon_vect = sample_polygons
-  }
-  else {
-    print('Converting to a Spat Vector - this function might break here')
-    polygon_vect <- terra::vect(sample_polygons)
-  }
-  if (grepl('-', names(raster)) == T) {
-    for (i in 1:length(polygon_vect$ID)) {
-      polygon <- polygon_vect[i]
-      r.clip <-
-        raster %>% terra::project(terra::crs(polygon)) %>% terra::crop(polygon)
-      r.dt = terra::xyFromCell(r.clip, 1:terra::ncell(r.clip)) %>%
-        cbind(terra::values(r.clip)) %>%
-        terra::as.data.frame() %>% dplyr::mutate(CellID = rownames(.)) %>% tidyr::pivot_longer(
-          cols = c(contains('-')),
-          names_to = 'year',
-          values_to = 'metric'
-        ) %>%
-        dplyr::mutate(year_n = as.numeric(substr(as.character(.$year), 1, 4)))
-      summary_polygons[[i]] <-
-        r.dt %>% tidyr::group_by(year_n) %>% dplyr::summarize(
-          mean_nbr = mean(nbr, na.rm = T),
-          sd_nbr = sd(nbr, na.rm = T),
-          upp_bound = mean_nbr + sd_nbr,
-          lwr_bound = mean_nbr - sd_nbr,
-          ID = polygon$ID
-        ) %>% dplyr::left_join(polygon, copy = T)
-      polygon_info[[i]] <- r.dt
-      rast_clips[[i]] <- r.clip
+clip_polygon_list <-
+  function(sample_polygons, sds_choose, file_save) {
+    print(file_save)
+    for (i in 1:length(sample_polygons)) {
+      print(i)
+      query_site_nums <-
+        names(sample_polygons)[which(grepl('ID$', names(sample_polygons)))] # Get the ID column to store in the file_names
+      site_id <- paste0(sample_polygons[i, query_site_nums])[1]
+      query_disturbance <-
+        which(grepl('SR_10S_$', names(sample_polygons)))
+      disturbance_year <-
+        paste0(sample_polygons[i, query_disturbance])[1]
+      if (missing(query_disturbance) == F) {
+        site_name <- paste0(site_id, '_', disturbance_year)
+        print(paste(
+          'working on site id',
+          site_id,
+          'which was disturbed in',
+          disturbance_year
+        ))
+        poly_vect <- vect(sample_polygons[i, ]) %>% project(sds_read)
+        crop_sds <- sds_read %>% crop(poly_vect)
+        direct_save <- paste0(file_save, site_id)
+        if (dir.exists(direct_save) == T) {
+          print('Overwriting Site Numbers')
+          for (n in 1:length(crop_sds)) {
+            file_tosave <-
+              paste0(direct_save,
+                     '/site_' ,
+                     site_name,
+                     "_",
+                     substr(names(crop_sds)[n], 1, 4),
+                     ".tif")
+            terra::writeRaster(x = crop_sds[[n]],
+                               filename = file_tosave,
+                               overwrite = T)
+          }
+        }
+        else if (dir.exists(direct_save) == F) {
+          dir.create(direct_save)
+          for (n in 1:length(crop_sds)) {
+            file_tosave <-
+              paste0(direct_save,
+                     '/site_',
+                     site_name,
+                     "_",
+                     substr(names(crop_sds)[n], 1, 4),
+                     ".tif")
+            rast_tosave <- crop_sds[[n]]
+            terra::writeRaster(rast_tosave,
+                               filename = file_tosave,
+                               overwrite = F)
+          }
+        }
+      }
+      else if (missing(query_disturbance) == T) {
+        site_name <- paste0(site_id, '_')
+        print(paste(
+          'working on site id',
+          site_id,
+          'which has no NTEMS disturbance information'
+        ))
+        poly_vect <- vect(sample_polygons[i, ]) %>% project(sds_read)
+        crop_sds <- sds_read %>% crop(poly_vect)
+        direct_save <- paste0(file_save, site_id)
+        if (dir.exists(direct_save) == T) {
+          print('Overwriting Site Numbers')
+          for (n in 1:length(crop_sds)) {
+            file_tosave <-
+              paste0(direct_save,
+                     '/site_' ,
+                     site_name,
+                     "_",
+                     substr(names(crop_sds)[n], 1, 4),
+                     ".tif")
+            terra::writeRaster(x = crop_sds[[n]],
+                               filename = file_tosave,
+                               overwrite = T)
+          }
+        }
+        else if (dir.exists(direct_save) == F) {
+          dir.create(direct_save)
+          for (n in 1:length(crop_sds)) {
+            file_tosave <-
+              paste0(direct_save,
+                     '/site_',
+                     site_name,
+                     "_",
+                     substr(names(crop_sds)[n], 1, 4),
+                     ".tif")
+            rast_tosave <- crop_sds[[n]]
+            terra::writeRaster(rast_tosave,
+                               filename = file_tosave,
+                               overwrite = F)
+          }
+        }
+      }
+      print(paste(
+        'SpatRasterDataset cropped files for each polygon stored in',
+        file_save
+      ))
     }
   }
-  else {
-    for (i in 1:length(polygon_vect$ID)) {
-      polygon <- polygon_vect[i]
-      r.clip <-
-        raster %>% terra::project(terra::crs(polygon)) %>% terra::crop(polygon)
-      r.dt = terra::xyFromCell(r.clip, 1:terra::ncell(r.clip)) %>%
-        cbind(terra::values(r.clip)) %>%
-        terra::as.data.frame() %>% dplyr::mutate(CellID = rownames(.)) %>% tidyr::pivot_longer(cols = starts_with('y_'),
-                                                                                               names_to = 'year',
-                                                                                               values_to = 'metric') %>%
-        dplyr::mutate(year_n = as.numeric(substr(as.character(.$year), 1, 4)))
-      summary_polygons[[i]] <-
-        r.dt %>% tidyr::group_by(year_n) %>% dplyr::summarize(
-          mean_nbr = mean(nbr, na.rm = T),
-          sd_nbr = sd(nbr, na.rm = T),
-          upp_bound = mean_nbr + sd_nbr,
-          lwr_bound = mean_nbr - sd_nbr,
-          ID = polygon$ID
-        ) %>% dplyr::left_join(polygon, copy = T)
-      polygon_info[[i]] <- r.dt
-      rast_clips[[i]] <- r.clip
-    }
-  }
-  if (return_rasters == T) {
-    list_outs <- list(as.data.frame(bind_rows(summary_polygons)),
-                      rast_clips)
-    return(list_outs)
-  }
-  if (missing(return_rasters))
-  {
-    return(as.data.frame(bind_rows(summary_polygons)))
-  }
-}
