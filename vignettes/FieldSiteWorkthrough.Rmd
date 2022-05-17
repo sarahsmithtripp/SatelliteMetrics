@@ -1,0 +1,31 @@
+---
+title: "FieldSiteWorkthrough"
+author: Sarah Smith-Tripp PhD Student UBC 
+date: May 16 2022
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{FieldSiteWorkthrough}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+#Overview of the Satellite Metrics Package
+
+SatelliteMetrics is designed to expedite workflows of processing spectral metrics within polygons so they can be rapidly aligned to structural measures from lidar or otherwise. Currently, there are three functions associated with the package. Mean_annum_sds, temporal_metrics_sds, and clip_polygon_list. The package relies heavily on spat raster datasets, which are a collection of spat rasters that have the same extent and datatype. 
+
+### Package Components: 
+
+:Mean_annum_sds - calculates the annual value for each layer of a spat raster dataset. Input should be a smaller raster. The function will calculate and output a dataframe with the mean, standard deviation, upper and lower quantile for each input layer. 
+:temporal_metrics_sds - a flexible function that calculates the mean and standard deviation for each cell of a raster for a specified time period. The function  can either calculate forwards or backwards, meaning it can start from the year of disturbance or from the present year. Output is a raster that includes the metrics input calculated temporally 
+:clip_polygon_list - a function that takes a raster and a list of polygons to clip the raster by. 
+
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(SatelliteMetrics)
+```
