@@ -7,7 +7,9 @@
 #' @param eval_funct functions to evaluate for temporal metrics
 #' @param polygon region to clip spat raster dataset by
 #' @param disturbance_year optional argument to state what you would like to calculate by
+#' @return metrics
 #' @examples
+#' \dontrun{
 #' A an examples of the function summary input by the user
 #' funSummary <- function(x){
 #'
@@ -17,10 +19,11 @@
 #'    slope = foster::theilSen(x)
 #'   )
 #' }
+#' }
 #'@export
 #'@importFrom dplyr %>%
 
-temporal_sds <- function(sds_choose,
+temporal_metrics_sds <- function(sds_choose,
                          time_length,
                          last_year,
                          eval_funct,
@@ -30,14 +33,15 @@ temporal_sds <- function(sds_choose,
   sds_choose <- sds_choose
   ##sds is a spd datset
   tik <- length(sds_choose)
-  names <- substr(names(sds_choose), 1, 3)
+  names <- names(sds_choose)
   year_n <- dim(sds_choose[[1]])[3]
+  metrics <- list()
   if (missing(polygon) == F) {
     if (class(polygon) != 'SpatVector') {
       print('input must be a spat vector with the same CRS as the spat raster dataset')
     }
     else {
-      sds_choose <- sds_choose %>% crop(polygon)
+      sds_choose <- sds_choose %>% terra::crop(polygon)
     }
   }
   else if (missing(polygon) == T) {
@@ -45,7 +49,7 @@ temporal_sds <- function(sds_choose,
     sds_choose <- sds_choose
   }
   if (missing(disturbance_year) == T) {
-    for (n in 1:length(sds)) {
+    for (n in 1:length(sds_choose)) {
       metric_name <- names[n]
       print(paste('Working On', metric_name))
       r <- sds_choose[[n]]
@@ -84,7 +88,7 @@ temporal_sds <- function(sds_choose,
   }
   else if
     (missing(disturbance_year) == F) {
-      for (n in 1:lenght(sds)) {
+      for (n in 1:length(sds_choose)) {
         metric_name <- names[n]
         print(paste('Working On', metric_name))
         r <- sds_choose[[n]]
@@ -123,4 +127,5 @@ temporal_sds <- function(sds_choose,
         }
       }
     }
+  return(metrics)
 }

@@ -5,14 +5,16 @@
 #' @param sds_choose is a spat raster dataset that will be clipped for each polygon
 #' @param file_save the location to store the clipped polygons
 #' @examples
+#' \dontrun{
 #' file_save <- c('.')
 #' sample_polygons <- read_sf('./shapefile.shp')
 #' sds_to_run <- terra::sds(list.files('./stacked_metrics', pattern =- '00.tif$', full.names = T))
 #'
 #' clip_polygon_list(sample_polygons, sds_choose = sds_to_run, file_save = file_save)
-#'
+#'}
 #' @export
 #' @importFrom dplyr %>%
+#' @rawNamespace  import(ggplot2)
 
 
 clip_polygon_list <-
@@ -35,11 +37,12 @@ clip_polygon_list <-
           'which was disturbed in',
           disturbance_year
         ))
-        poly_vect <- vect(sample_polygons[i, ]) %>% project(sds_read)
-        crop_sds <- sds_read %>% crop(poly_vect)
+        poly_vect <- terra::vect(sample_polygons[i, ]) %>% terra::project(sds_choose)
+        crop_sds <- sds_choose %>% terra::crop(poly_vect)
         direct_save <- paste0(file_save, site_id)
         if (dir.exists(direct_save) == T) {
-          print('Overwriting Site Numbers')
+          print(paste0('Overwriting Site Numbers and storing to',
+                       direct_save))
           for (n in 1:length(crop_sds)) {
             file_tosave <-
               paste0(direct_save,
@@ -77,8 +80,8 @@ clip_polygon_list <-
           site_id,
           'which has no NTEMS disturbance information'
         ))
-        poly_vect <- vect(sample_polygons[i, ]) %>% project(sds_read)
-        crop_sds <- sds_read %>% crop(poly_vect)
+        poly_vect <- terra::vect(sample_polygons[i, ]) %>% terra::project(sds_choose)
+        crop_sds <- sds_choose %>% terra::crop(poly_vect)
         direct_save <- paste0(file_save, site_id)
         if (dir.exists(direct_save) == T) {
           print('Overwriting Site Numbers')
