@@ -25,13 +25,14 @@ clip_polygon_list <-
   function(sample_polygons, sds_choose, file_save) {
     print(file_save)
     for (i in 1:length(sample_polygons)) {
+      poly <- sample_polygons[[i]]
       print(i)
-      query_site_nums <- which(grepl('ID$', names(sample_polygons))) # Get the ID column to store in the file_names
-      site_id <- paste0(sample_polygons[i, query_site_nums])[1]
+      query_site_nums <- which(grepl('ID$', names(poly))) # Get the ID column to store in the file_names
+      site_id <- paste0(poly[1, query_site_nums])[1]
       query_disturbance <-
-        which(grepl('SR_10S_$', names(sample_polygons)))
+        which(grepl('SR_10S_$', names(poly)))
       disturbance_year <-
-        paste0(sample_polygons[i, query_disturbance])[1]
+        paste0(poly[1, query_disturbance])[1]
       if (missing(query_disturbance) == F) {
         site_name <- paste0(site_id, '_', disturbance_year)
         print(paste(
@@ -40,7 +41,7 @@ clip_polygon_list <-
           'which was disturbed in',
           disturbance_year
         ))
-        poly_vect <- terra::vect(sample_polygons[i, ]) %>% terra::project(sds_choose)
+        poly_vect <- terra::vect(poly) %>% terra::project(sds_choose)
         crop_sds <- sds_choose %>% terra::crop(poly_vect)
         direct_save <- paste0(file_save, site_id)
         if (dir.exists(direct_save) == T) {
@@ -83,7 +84,7 @@ clip_polygon_list <-
           site_id,
           'which has no NTEMS disturbance information'
         ))
-        poly_vect <- terra::vect(sample_polygons[i, ]) %>% terra::project(sds_choose)
+        poly_vect <- terra::vect(poly) %>% terra::project(sds_choose)
         crop_sds <- sds_choose %>% terra::crop(poly_vect)
         direct_save <- paste0(file_save, site_id)
         if (dir.exists(direct_save) == T) {
