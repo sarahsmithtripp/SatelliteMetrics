@@ -12,6 +12,7 @@
 #'
 #' clip_polygon_list(sample_polygons, sds_choose = sds_to_run, file_save = file_save)
 #'}
+#'
 #' @export
 #' @importFrom dplyr %>%
 #' @rawNamespace  import(ggplot2)

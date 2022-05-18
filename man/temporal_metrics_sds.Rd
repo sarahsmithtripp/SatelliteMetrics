@@ -10,7 +10,8 @@ temporal_metrics_sds(
   last_year,
   eval_funct,
   polygon,
-  disturbance_year
+  disturbance_year,
+  parent_folder
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ temporal_metrics_sds(
 \item{polygon}{region to clip spat raster dataset by}
 
 \item{disturbance_year}{optional argument to state what you would like to calculate by}
+
+\item{parent_folder}{a folder that designates where to store the files}
 }
 \value{
 metrics

@@ -1,4 +1,4 @@
-#' Calculates the mean and standard deviation of annual metrics from BAP SDS
+#' Calculates a temporal values for a user defined time period and user defined function. Example function included in the documentation.
 #'
 #'
 #' @param sds_choose this is a spatrasterdataset where each spat raster is stacked annually
@@ -7,6 +7,7 @@
 #' @param eval_funct functions to evaluate for temporal metrics
 #' @param polygon region to clip spat raster dataset by
 #' @param disturbance_year optional argument to state what you would like to calculate by
+#' @param parent_folder a folder that designates where to store the files
 #' @return metrics
 #' @examples
 #' \dontrun{
@@ -28,7 +29,8 @@ temporal_metrics_sds <- function(sds_choose,
                          last_year,
                          eval_funct,
                          polygon,
-                         disturbance_year) {
+                         disturbance_year,
+                         parent_folder) {
   ## polygon is the data that you are working with
   sds_choose <- sds_choose
   ##sds is a spd datset
@@ -69,7 +71,7 @@ temporal_metrics_sds <- function(sds_choose,
         print(paste('Working On', subset_years[2], '-', subset_years[1]))
         file_name <-
           paste0(
-            './',
+            parent_folder,'/',
             metric_name,
             '_',
             substr(subset_years[2], 1, 4),
@@ -110,7 +112,7 @@ temporal_metrics_sds <- function(sds_choose,
           print(paste('Working On', subset_years[2], '-', subset_years[1]))
           file_name <-
             paste0(
-              './',
+              parent_folder,'/',
               metric_name,
               '_',
               substr(subset_years[2], 1, 4),
@@ -127,5 +129,4 @@ temporal_metrics_sds <- function(sds_choose,
         }
       }
     }
-  return(metrics)
 }

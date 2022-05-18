@@ -24,4 +24,5 @@ sds_to_run <- terra::sds(list.files('./stacked_metrics', pattern =- '00.tif$', f
 
 clip_polygon_list(sample_polygons, sds_choose = sds_to_run, file_save = file_save)
 }
+
 }
