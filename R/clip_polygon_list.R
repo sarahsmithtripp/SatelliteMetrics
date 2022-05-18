@@ -16,7 +16,9 @@
 #'
 #' @export
 #' @importFrom dplyr %>%
-#' @rawNamespace  import(ggplot2)
+#' @rawNamespace import(ggplot2)
+#' @rawNamespace import(dplyr)
+
 
 
 clip_polygon_list <-
@@ -24,8 +26,7 @@ clip_polygon_list <-
     print(file_save)
     for (i in 1:length(sample_polygons)) {
       print(i)
-      query_site_nums <-
-        names(sample_polygons)[which(grepl('ID$', names(sample_polygons)))] # Get the ID column to store in the file_names
+      query_site_nums <- which(grepl('ID$', names(sample_polygons))) # Get the ID column to store in the file_names
       site_id <- paste0(sample_polygons[i, query_site_nums])[1]
       query_disturbance <-
         which(grepl('SR_10S_$', names(sample_polygons)))

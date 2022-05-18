@@ -9,6 +9,8 @@ vignette: >
   %\VignetteIndexEntry{FieldSiteWorkthrough}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+  %\VignetteDepends{dplyr}
+  %\VignetteDepnds{tidyverse}
 ---
 #Overview of the Satellite Metrics Package
 
@@ -34,6 +36,7 @@ library(SatelliteMetrics)
 library(tidyverse)
 library(ggplot2)
 library(terra)
+library(sf)
 ```
 #Running the package 
 
