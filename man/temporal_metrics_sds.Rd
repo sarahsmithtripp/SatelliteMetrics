@@ -2,7 +2,7 @@
 % Please edit documentation in R/temporal_metrics_sds.R
 \name{temporal_metrics_sds}
 \alias{temporal_metrics_sds}
-\title{Calculates the mean and standard deviation of annual metrics from BAP SDS}
+\title{Calculates a temporal values for a user defined time period and user defined function. Example function included in the documentation.}
 \usage{
 temporal_metrics_sds(
   sds_choose,
@@ -33,7 +33,7 @@ temporal_metrics_sds(
 metrics
 }
 \description{
-Calculates the mean and standard deviation of annual metrics from BAP SDS
+Calculates a temporal values for a user defined time period and user defined function. Example function included in the documentation.
 }
 \examples{
 \dontrun{

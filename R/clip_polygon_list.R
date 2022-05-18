@@ -6,6 +6,7 @@
 #' @param file_save the location to store the clipped polygons
 #' @examples
 #' \dontrun{
+#'
 #' file_save <- c('.')
 #' sample_polygons <- read_sf('./shapefile.shp')
 #' sds_to_run <- terra::sds(list.files('./stacked_metrics', pattern =- '00.tif$', full.names = T))
