@@ -14,9 +14,9 @@ SatelliteMetrics is designed to expedite workflows of processing spectral metric
 
 ### Package Components: 
 
-:Mean_annum_sds - calculates the annual value for each layer of a spat raster dataset. Input should be a smaller raster. The function will calculate and output a dataframe with the mean, standard deviation, upper and lower quantile for each input layer. 
-:temporal_metrics_sds - a flexible function that calculates the mean and standard deviation for each cell of a raster for a specified time period. The function  can either calculate forwards or backwards, meaning it can start from the year of disturbance or from the present year. Output is a raster that includes the metrics input calculated temporally 
-:clip_polygon_list - a function that takes a raster and a list of polygons to clip the raster by. 
+* **Mean_annum_sds** - calculates the annual value for each layer of a spat raster dataset. Input should be a smaller raster. The function will calculate and output a dataframe with the mean, standard deviation, upper and lower quantile for each input layer. 
+* **temporal_metrics_sds** - a flexible function that calculates the mean and standard deviation for each cell of a raster for a specified time period. The function  can either calculate forwards or backwards, meaning it can start from the year of disturbance or from the present year. Output is a raster that includes the metrics input calculated temporally 
+* **clip_polygon_list** - a function that takes a raster and a list of polygons to clip the raster by. 
 
 
 ```{r, include = FALSE}
@@ -28,4 +28,112 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(SatelliteMetrics)
+```
+#Running the package 
+
+This package comes pre-installed with several datafiles including a list of tif files that I load in as a SpatRasterDataset and grouping of polygons that represent sample sites I have selected for field sampling in 2022. Below I show examples using these combinations of files to test the package contents.
+
+##Clip Polygon List 
+
+Running the code below outside of the chunk but in the terminal should result in collection of files created and saved to the temporary directory.
+
+```{r, eval = F}
+file_save <- tempdir() #will save to a temporary directorty on your computer
+sample_polygons <-  sf::read_sf(system.file('extdata/polygon_list',"sample_polygons.shp", package = "SatelliteMetrics"))
+
+## this is a cropped list of raster files for tasseled cap indices from 1984 to 2021
+rast_files <- list.files(paste0(system.file(package = 'SatelliteMetrics'),
+                                '/extdata/sds_folder/'),
+                         full.names = T)
+sds_to_run <- terra::sds(rast_files)
+
+clip_polygon_list(sample_polygons, sds_choose = sds_to_run, file_save = file_save)
+
+```
+## Calculate statistics for areas within a polygon 
+
+The next step we use is to calculate statistics using mean_annum_sds. This takes a SpatRasterDataset and then calculates the statistics for a given polygon. 
+
+I can run this on a single polygon 
+
+```{r}
+workdir <- getwd()
+polygon_file_string <- c(paste0(workdir,'/inst/extdata/polygon_list/sample_polygons.shp'))
+#sample_polygons <- sf::read_sf(system.file('/inst/extdata/polygon_list',"sample_polygons.shp", package = "SatelliteMetrics"))
+sample_polygons <- sf::read_sf(polygon_file_string)
+polygon <- sample_polygons[1,]
+
+## this is a cropped list of raster files for tasseled cap indices from 1984 to 2021
+# rast_files <- list.files(paste0(system.file(package = 'SatelliteMetrics'),
+#                                 '/inst/extdata/sds_folder/'),
+#                          full.names = T)
+rast_files <- list.files(paste0(workdir, '/inst/extdata/sds_folder/'), full.names = T)
+sds_to_run <- terra::sds(rast_files)
+#
+#annual_metrics <- mean_annum_sds(sds_choose = sds_to_run, polygon = polygon)
+
+# ggplot() +
+#   geom_line(data = dplyr::filter(annual_metrics, type == 'mean' ),
+#             aes(year, value/1000, color = as.factor(change_year))) +
+#   geom_line(data = dplyr::filter(annual_metrics, type == 'upp_bound'),
+#             aes(year, value/1000), linetype = 'dashed') +
+#   geom_line(data = dplyr::filter(annual_metrics, type == 'lwr_bound'),
+#             aes(year, value/1000), linetype = 'dashed') +
+#   facet_wrap( ~Metric, ncol = 1) +
+#   theme_bw() +xlab('Metric Value / 1000')  + ylab('Year') + labs(color = 'Year of Change') +
+#   ggtitle('Tasseled Cap Metrics for Sample site 22 averaged for polygon area')
+
+```
+
+## Calculate Temporal Metrics for Each Cell of a Raster
+
+For some indices it is particularly important to know scale independent metrics or direction of change for the metrics. The temporal metrics function takes a user-provided function to then assess over given time periods. You calulate either forwards or backwards - meaning from the last date provided in the dataset, or from the date of disturbance and forward 
+
+```{r, eval = F}
+## Define parameters
+funSummary <- function(x) {
+  c(
+    median = median(x, na.rm = TRUE),
+    IQR = IQR(x, na.rm = TRUE),
+    slope = foster::theilSen(x)
+  )
+}
+
+setwd(tempdir())
+backward_temporal_metrics <- temporal_metrics_sds(sds_choose = sds_to_run, 
+                     time_length = 5,
+                     last_year = 2021,
+                     eval_funct = funSummary)
+
+sds_Temporal <- list.files('.', full = T)
+source_names <- substr(list.files('.', full = F)[2:length(sds_Temporal)],22, 35)
+sds_Temporal <- sds_Temporal[2:length(sds_Temporal)]
+naming_function <- function(df, add_name){
+  df <- dplyr::mutate(df, metric_name = paste0(add_name))
+  return(df)
+}
+temporal_rasters_summary <- purrr::map(sds_Temporal, terra::rast) %>% 
+    purrr::map(terra::subset, c('slope'))  %>% 
+  purrr::map(terra::as.data.frame, cells = T, optional = T) %>% 
+  purrr::map2(.y = source_names, .f = naming_function) %>% dplyr::bind_rows() %>%
+  dplyr::mutate(metric = substr(metric_name, 1,3),
+                last_year = substr(metric_name, 11,15)) %>% 
+  dplyr::group_by(metric_name) %>% 
+  dplyr::summarise(mean_slope = mean(slope, na.rm = T), .groups = 'keep',
+                   metric = metric, 
+                   last_year = last_year)
+
+## plot this data to look at later 
+plot_data <- unique(dplyr::filter(temporal_rasters_summary, metric != 'TCW'))
+
+ggplot(plot_data, aes(x = last_year, y = mean_slope, group = metric)) + geom_line() + facet_wrap(~ metric) + ggtitle('5 year mean slope for Tasseled Cap Metrics)
+
+
+```
+
+Now I can calculate the annual measure for the polygon for each year. We are calculating and displaying the metrics for each five year time period 
+```{r, eval = F}
+annual_metrics <- mean_annum_sds(sds_choose = sds_to_run, polygon = polygon)
+
+
 ```

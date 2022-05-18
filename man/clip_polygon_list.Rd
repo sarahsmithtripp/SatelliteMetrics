@@ -2,17 +2,26 @@
 % Please edit documentation in R/clip_polygon_list.R
 \name{clip_polygon_list}
 \alias{clip_polygon_list}
-\title{creates a polygon list to work with}
+\title{Uses a polygon list to clip a given raster}
 \usage{
-clip_polygon_list(sample_polygons, r, return_rasters)
+clip_polygon_list(sample_polygons, sds_choose, file_save)
 }
 \arguments{
 \item{sample_polygons}{should be a polygon list in SF language}
 
-\item{return_rasters}{would yuo like to return the raster list?}
+\item{sds_choose}{is a spat raster dataset that will be clipped for each polygon}
 
-\item{raster}{is a raster that will be clipped for each polygon}
+\item{file_save}{the location to store the clipped polygons}
 }
 \description{
-creates a polygon list to work with
+Uses a polygon list to clip a given raster
+}
+\examples{
+\dontrun{
+file_save <- c('.')
+sample_polygons <- read_sf('./shapefile.shp')
+sds_to_run <- terra::sds(list.files('./stacked_metrics', pattern =- '00.tif$', full.names = T))
+
+clip_polygon_list(sample_polygons, sds_choose = sds_to_run, file_save = file_save)
+}
 }

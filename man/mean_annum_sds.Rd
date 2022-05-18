@@ -9,7 +9,7 @@ mean_annum_sds(sds_choose, polygon)
 \arguments{
 \item{sds_choose}{this is a spatrasterdataset where each spat raster is stacked annually}
 
-\item{polygon}{a polygon of some vector that is the same projection of the spat raster used to crop the sds}
+\item{polygon}{a polygon of some vector that is a sf object. The function will convert to a vector object to crop}
 }
 \description{
 Calculates the mean and standard deviation of annual metrics from BAP SDS
