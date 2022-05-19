@@ -43,7 +43,7 @@ clip_polygon_list <-
         ))
         poly_vect <- terra::vect(poly) %>% terra::project(sds_choose)
         crop_sds <- sds_choose %>% terra::crop(poly_vect)
-        direct_save <- paste0(file_save, site_id)
+        direct_save <- paste0(file_save,'/', site_id)
         if (dir.exists(direct_save) == T) {
           print(paste0('Overwriting Site Numbers and storing to',
                        direct_save))
@@ -61,6 +61,7 @@ clip_polygon_list <-
           }
         }
         else if (dir.exists(direct_save) == F) {
+          print(paste0('Creating a new directory to:', direct_save))
           dir.create(direct_save)
           for (n in 1:length(crop_sds)) {
             file_tosave <-
