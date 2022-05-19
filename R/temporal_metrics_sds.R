@@ -23,6 +23,7 @@
 #' }
 #'@export
 #'@importFrom dplyr %>%
+#'@rawNamespace import(foster)
 
 temporal_metrics_sds <- function(sds_choose,
                          time_length,
@@ -84,7 +85,8 @@ temporal_metrics_sds <- function(sds_choose,
         r_sub <-
           r %>% terra::subset(match[1]:match[2]) ## Subset raster to just years of interest
         metrics[[l]] <- terra::app(r_sub,
-                                   fun = eval_funct, filename = file_name)
+                                   fun = eval_funct, filename = file_name,
+                                   overwrite = T)
       }
     }
   }
@@ -125,7 +127,8 @@ temporal_metrics_sds <- function(sds_choose,
           r_sub <-
             r %>% terra::subset(match[1]:match[2]) ## Subset raster to just years of interest
           metrics[[l]] <- terra::app(r_sub,
-                                     fun = eval_funct, filename = file_name)
+                                     fun = eval_funct, filename = file_name,
+                                     overwrite = F)
         }
       }
     }

@@ -12,7 +12,8 @@ RoxygenNote: 7.1.2
 Imports: 
     magrittr,
 	dplyr,
-	ggplot2
+	ggplot2,
+	foster
 Suggests: 
     rmarkdown,
     tidyverse,
