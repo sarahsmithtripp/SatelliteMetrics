@@ -4,7 +4,7 @@
 \alias{clip_polygon_list}
 \title{Uses a polygon list to clip a given raster}
 \usage{
-clip_polygon_list(sample_polygons, sds_choose, file_save)
+clip_polygon_list(sample_polygons, sds_choose, file_save, disturbed)
 }
 \arguments{
 \item{sample_polygons}{should be a polygon list in SF language}
@@ -12,6 +12,8 @@ clip_polygon_list(sample_polygons, sds_choose, file_save)
 \item{sds_choose}{is a spat raster dataset that will be clipped for each polygon}
 
 \item{file_save}{the location to store the clipped polygons}
+
+\item{disturbed}{Is this location disturbed?}
 }
 \description{
 Uses a polygon list to clip a given raster

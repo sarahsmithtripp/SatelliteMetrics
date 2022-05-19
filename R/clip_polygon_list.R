@@ -4,6 +4,7 @@
 #' @param sample_polygons should be a polygon list in SF language
 #' @param sds_choose is a spat raster dataset that will be clipped for each polygon
 #' @param file_save the location to store the clipped polygons
+#' @param disturbed Is this location disturbed?
 #' @examples
 #' \dontrun{
 #'
@@ -22,18 +23,19 @@
 
 
 clip_polygon_list <-
-  function(sample_polygons, sds_choose, file_save) {
+  function(sample_polygons, sds_choose, file_save,
+           disturbed) {
     print(file_save)
     for (i in 1:length(sample_polygons)) {
       poly <- sample_polygons[[i]]
       print(i)
       query_site_nums <- which(grepl('ID$', names(poly))) # Get the ID column to store in the file_names
       site_id <- paste0(poly[1, query_site_nums])[1]
-      query_disturbance <-
-        which(grepl('SR_10S_$', names(poly)))
-      disturbance_year <-
-        paste0(poly[1, query_disturbance])[1]
-      if (missing(query_disturbance) == F) {
+      if (missing(disturbed) == F) {
+        query_disturbance <-
+          which(grepl('SR_10S_$', names(poly)))
+        disturbance_year <-
+          paste0(poly[1, query_disturbance])[1]
         site_name <- paste0(site_id, '_', disturbance_year)
         print(paste(
           'working on site id',
@@ -78,7 +80,7 @@ clip_polygon_list <-
           }
         }
       }
-      else if (missing(query_disturbance) == T) {
+      else if (missing(disturbed) == T) {
         site_name <- paste0(site_id, '_')
         print(paste(
           'working on site id',
