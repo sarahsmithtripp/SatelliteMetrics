@@ -22,6 +22,7 @@ mean_annum_sds <- function(sds_choose, polygon) {
     print('If area of the raster is very large function may take a long time to run')
     names <- substr(names(sds_choose), 22, 25)
     ID_col <- substr(names(sds_choose), 6, 7)
+    print('made it to here')
     change_year <- substr(names(sds_choose), 17, 20)[1]
   }
   ##sds is a sds datset
