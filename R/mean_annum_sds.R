@@ -24,19 +24,16 @@ mean_annum_sds <- function(sds_choose, polygon,
   else if (missing(polygon) == T) {
     print('If area of the raster is very large function may take a long time to run')
     names <- substr(names(sds_choose), 22, 25)
+    ID_col <- names(sds_choose)[which(grepl('site_*', names(sds_choose)))] # Get the ID column to store in the file_names
     ID_col <- substr(names(sds_choose), 6, 7)
-    print('made it to missing polygons')
     change_year <- substr(names(sds_choose), 17, 20)[1]
   }
   ##sds is a sds datset
   r_list_length <- length(sds_choose)
   names <- substr(names(sds_choose), 1, 3)
   data_out <- list()
-  print('out of the if else and into the for loop')
   for (i in 1:r_list_length) {
-    print('attempting to subset sds')
     r <- sds_choose[[i]]
-    print('subset sds')
     name_metric <- names(sds_choose)[i]
     print(ID_col)
     if(nchar(year_format) == 6) {
