@@ -38,7 +38,7 @@ mean_annum_sds <- function(sds_choose, polygon) {
     print(ID_col)
     r.dt <-
       terra::values(r) %>% terra::as.data.frame() %>% dplyr::mutate(CellID = rownames(.)) %>% tidyr::pivot_longer(
-        cols = c(dplyr::contains('-08-01')),
+        cols = c(dplyr::contains('-08-01' | '[[digit]]{4}')),
         names_to = 'year',
         values_to = 'metric'
       ) %>%
