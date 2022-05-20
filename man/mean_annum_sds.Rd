@@ -4,12 +4,14 @@
 \alias{mean_annum_sds}
 \title{Calculates the mean and standard deviation of annual metrics from BAP SDS}
 \usage{
-mean_annum_sds(sds_choose, polygon)
+mean_annum_sds(sds_choose, polygon, year_format)
 }
 \arguments{
 \item{sds_choose}{this is a spatrasterdataset where each spat raster is stacked annually}
 
 \item{polygon}{a polygon of some vector that is a sf object. The function will convert to a vector object to crop}
+
+\item{year_format}{the form of the data for the spat raster dataset - used to subset the function successfully. Should be '08-01'or '2021'}
 }
 \description{
 Calculates the mean and standard deviation of annual metrics from BAP SDS

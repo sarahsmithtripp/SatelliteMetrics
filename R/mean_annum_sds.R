@@ -2,11 +2,14 @@
 #'
 #' @param sds_choose this is a spatrasterdataset where each spat raster is stacked annually
 #' @param polygon a polygon of some vector that is a sf object. The function will convert to a vector object to crop
+#' @param year_format the form of the data for the spat raster dataset - used to subset the function successfully. Should be '08-01'or '2021'
+#'
 #' @export
 #' @importFrom dplyr %>%
 
 
-mean_annum_sds <- function(sds_choose, polygon) {
+mean_annum_sds <- function(sds_choose, polygon,
+                           year_format) {
   ## polygon is the data that you are working with
   if (missing(polygon) == F)
   {
@@ -36,13 +39,21 @@ mean_annum_sds <- function(sds_choose, polygon) {
     print('subset sds')
     name_metric <- names(sds_choose)[i]
     print(ID_col)
+    if(nchar(year_format) == 6)
     r.dt <-
       terra::values(r) %>% terra::as.data.frame() %>% dplyr::mutate(CellID = rownames(.)) %>% tidyr::pivot_longer(
-        cols = c(dplyr::contains('-08-01' | '[[digit]]{4}')),
+        cols = c(dplyr::contains(year_format)),
         names_to = 'year',
         values_to = 'metric'
       ) %>%
-      dplyr::mutate(year_n = as.numeric(gsub("-08-01", "", as.character(.$year))))
+      dplyr::mutate(year_n = as.numeric(gsub(year_format, "", as.character(.$year))))
+    else if(nchar(year_format)==4)
+      r.dt <-
+      terra::values(r) %>% terra::as.data.frame() %>% dplyr::mutate(CellID = rownames(.)) %>% tidyr::pivot_longer(
+        cols = c(dplyr::matches('\\d{4}')),
+        names_to = 'year',
+        values_to = 'metric'
+      )
     data <-
       r.dt %>% dplyr::group_by(year_n) %>% dplyr::summarize(
         mean = mean(metric, na.rm = T),
