@@ -91,11 +91,16 @@ temporal_metrics_sds <- function(sds_choose,
           )
         match <-
           unique(grep(paste(subset_years, collapse =  "|"), l_names))
+        if(length(match) != 2){
+          print('Last year truncated')
+        }
+        else if(length(match) == 2){
         r_sub <-
           r %>% terra::subset(match[1]:match[2]) ## Subset raster to just years of interest
         metrics[[l]] <- terra::app(r_sub,
                                    fun = eval_funct, filename = file_name,
                                    overwrite = T)
+        }
       }
     }
   }
