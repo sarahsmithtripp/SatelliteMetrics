@@ -39,7 +39,7 @@ mean_annum_sds <- function(sds_choose, polygon,
     print('subset sds')
     name_metric <- names(sds_choose)[i]
     print(ID_col)
-    if(nchar(year_format) == 6)
+    if(nchar(year_format) == 6) {
     r.dt <-
       terra::values(r) %>% terra::as.data.frame() %>% dplyr::mutate(CellID = rownames(.)) %>% tidyr::pivot_longer(
         cols = c(dplyr::contains(year_format)),
@@ -47,13 +47,19 @@ mean_annum_sds <- function(sds_choose, polygon,
         values_to = 'metric'
       ) %>%
       dplyr::mutate(year_n = as.numeric(gsub(year_format, "", as.character(.$year))))
-    else if(nchar(year_format)==4)
+    }
+    else if(nchar(year_format)==4){
       r.dt <-
       terra::values(r) %>% terra::as.data.frame() %>% dplyr::mutate(CellID = rownames(.)) %>% tidyr::pivot_longer(
         cols = c(dplyr::matches('\\d{4}')),
         names_to = 'year',
         values_to = 'metric'
-      )
+      ) %>%
+        dplyr::mutate(year_n = as.numeric(as.character(.$year)))
+    }
+    if(missing(change_year) == T){
+      change_year <- c('NA')
+    }
     data <-
       r.dt %>% dplyr::group_by(year_n) %>% dplyr::summarize(
         mean = mean(metric, na.rm = T),
