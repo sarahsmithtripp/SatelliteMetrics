@@ -64,9 +64,16 @@ temporal_metrics_sds <- function(sds_choose,
           to = c(last_year - time_length * vect_years),
           by = -time_length
         )
-      year_day <- paste0(years_to_return, '-08-01')
+      if(missing(year_format) == F){
+        year_day <- paste0(years_to_return)
       pairs <-
         data.frame(v1 = year_day[-length(year_day)], v2 = year_day[-1])
+      }
+      else if (missing(year_format) == T){
+        year_day <- paste0(years_to_return, '-08-01')
+        pairs <-
+          data.frame(v1 = year_day[-length(year_day)], v2 = year_day[-1])
+      }
       for (l in 1:length(pairs$v1)) {
         subset_years <- pairs[l, ]
         print(paste('Working On', subset_years[2], '-', subset_years[1]))
