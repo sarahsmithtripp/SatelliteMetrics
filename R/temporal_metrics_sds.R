@@ -8,6 +8,7 @@
 #' @param polygon region to clip spat raster dataset by
 #' @param disturbance_year optional argument to state what you would like to calculate by
 #' @param parent_folder a folder that designates where to store the files
+#' @param year_format an optional argument for if the style of year in the raster is '2021'
 #' @return metrics
 #' @examples
 #' \dontrun{
@@ -31,7 +32,8 @@ temporal_metrics_sds <- function(sds_choose,
                          eval_funct,
                          polygon,
                          disturbance_year,
-                         parent_folder) {
+                         parent_folder,
+                         year_format) {
   ## polygon is the data that you are working with
   sds_choose <- sds_choose
   ##sds is a spd datset
