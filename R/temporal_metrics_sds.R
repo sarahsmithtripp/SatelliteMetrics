@@ -25,6 +25,7 @@
 #'@export
 #'@importFrom dplyr %>%
 #'@rawNamespace import(foster)
+#'@rawNamespace import(future)
 
 temporal_metrics_sds <- function(sds_choose,
                          time_length,
