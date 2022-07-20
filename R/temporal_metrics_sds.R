@@ -25,7 +25,6 @@
 #'@export
 #'@importFrom dplyr %>%
 #'@rawNamespace import(foster)
-#'@rawNamespace import(future)
 
 temporal_metrics_sds <- function(sds_choose,
                          time_length,
@@ -35,8 +34,6 @@ temporal_metrics_sds <- function(sds_choose,
                          disturbance_year,
                          parent_folder,
                          year_format) {
-  # Get available cores for processing
-  cores <- max(1, future::availableCores() - 1)
   ## polygon is the data that you are working with
   sds_choose <- sds_choose
   ##sds is a spd datset
@@ -102,7 +99,7 @@ temporal_metrics_sds <- function(sds_choose,
           r %>% terra::subset(match[1]:match[2]) ## Subset raster to just years of interest
         metrics[[l]] <- terra::app(r_sub,
                                    fun = eval_funct, filename = file_name,
-                                   overwrite = T, cores = cores)
+                                   overwrite = T)
         }
       }
     }
@@ -145,7 +142,7 @@ temporal_metrics_sds <- function(sds_choose,
             r %>% terra::subset(match[1]:match[2]) ## Subset raster to just years of interest
           metrics[[l]] <- terra::app(r_sub,
                                      fun = eval_funct, filename = file_name,
-                                     overwrite = F, cores = cores)
+                                     overwrite = F)
         }
       }
     }
