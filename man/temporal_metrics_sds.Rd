@@ -11,7 +11,8 @@ temporal_metrics_sds(
   eval_funct,
   polygon,
   disturbance_year,
-  parent_folder
+  parent_folder,
+  year_format
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ temporal_metrics_sds(
 \item{disturbance_year}{optional argument to state what you would like to calculate by}
 
 \item{parent_folder}{a folder that designates where to store the files}
+
+\item{year_format}{an optional argument for if the style of year in the raster is '2021'}
 }
 \value{
 metrics
